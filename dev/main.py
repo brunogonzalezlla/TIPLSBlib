@@ -8,6 +8,7 @@ try:
     tip.save()
 except Exception as e:
     print("Añadida nueva persona")
+    print(tip.details())
     tip.add('Pepe', 'Facebook')
     print(tip.details())
     tip.save()

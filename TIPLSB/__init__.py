@@ -1,1 +1,1 @@
-from .functions import tiplsb
+from .class_tiplsb import tiplsb
