@@ -103,30 +103,32 @@ class tiplsb:
     def add(self, author, platform):
         # Generate list index with 3 bits
         l_index = self.get_ring(self.details_dic['Line'])
-        list_index = []
-        for i in l_index:
-            for j in range(0, 3):
-                list_index.append((i, j))
-        # Details
-        if self.details_dic['Datetime']:
-            details = "TIPLSB|" + str(author) + "|" + str(platform) + "|" + str(datetime.now().time()) + "#"
+        if len(l_index) == 0:
+            list_index = []
+            for i in l_index:
+                for j in range(0, 3):
+                    list_index.append((i, j))
+            # Details
+            if self.details_dic['Datetime']:
+                details = "TIPLSB|" + str(author) + "|" + str(platform) + "|" + str(datetime.now().time()) + "#"
+            else:
+                details = "TIPLSB|" + str(author) + "|" + str(platform) + "#"
+            bin_identifier = ''.join([format(ord(i), "08b") for i in details])
+            bin_identifier_len = len(bin_identifier)
+            character_index = 0
+            if (len(list_index) > bin_identifier_len):
+                random.shuffle(list_index, random.seed(self.hash_image))
+                for (p, q) in list_index:
+                    if character_index < bin_identifier_len:
+                        self.img_array[p][q] = int(bin(self.img_array[p][q])[2:9] + bin_identifier[character_index], 2)
+                        character_index += 1
+                    else:
+                        break
+                self.update_ring(self.details_dic['Line'] + 1)
+            else:
+                raise ValueError("The image does not have the necessary dimensions.")
         else:
-            details = "TIPLSB|" + str(author) + "|" + str(platform) + "#"
-        bin_identifier = ''.join([format(ord(i), "08b") for i in details])
-        bin_identifier_len = len(bin_identifier)
-        character_index = 0
-        if (len(list_index) > bin_identifier_len):
-            random.seed(self.hash_image)
-            shuffle(list_index)
-            for (p, q) in list_index:
-                if character_index < bin_identifier_len:
-                    self.img_array[p][q] = int(bin(self.img_array[p][q])[2:9] + bin_identifier[character_index], 2)
-                    character_index += 1
-                else:
-                    break
-            self.update_ring(self.details_dic['Line'] + 1)
-        else:
-            raise ValueError("The image does not have the necessary dimensions.")
+            raise Exception("The image is not large enough to add another user.")
 
     def update_ring(self, value):
         parameters = [
