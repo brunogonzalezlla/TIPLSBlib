@@ -4,7 +4,6 @@ import hashlib
 import random as rm
 import datetime
 
-
 class tiplsb:
     def __init__(self, path):
         self.version = '1.0.0'
@@ -208,3 +207,6 @@ class tiplsb:
         res_img = Image.fromarray(array.astype('uint8'), mode)
         res_img.save(new_path + ".png")
         return self.get_hash(new_path + ".png")
+
+def prueba():
+    print("hola")
