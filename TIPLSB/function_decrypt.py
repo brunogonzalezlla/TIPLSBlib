@@ -1,28 +1,51 @@
 from .class_tiplsb import tiplsb
 from .function_additional import *
-from PIL import Image
-import hashlib
-import random
+
 
 def tip_decode(path_original, path_modified):
-    # Open original image
-    img_original = Image.open(path_original, 'r').convert('RGB')
-    # Open modified image
-    img_modified = tiplsb(path_modified)
+    recorrido = []
 
+    # Abrir imagen modificada
+    tip_modified = tiplsb(path_modified)
 
-    h = hashlib.sha256(img.tobytes()).hexdigest()
-    width, height = img.size
-    img_array = np.array(list(img.getdata()))
-    print("Hash abierta")
-    print(hashlib.sha256(img.tobytes()).hexdigest())
-    img_modified = tiplsb(path_modified)
-    # Hash Image
-    with open(path_original, "rb") as f:
-        bytes_image = f.read()
-        hash_actual = hashlib.sha256(bytes_image).hexdigest()
-    random.seed(hash_actual)
-    l = random.sample(range(0, max_index_element_ring(img_modified.init['Line'], img_modified.width, img_modified.height)), k=48)
+    # Inicializamos imagen
+    tip_original = tiplsb(path_original, version=tip_modified.init['Version'], redundancy=tip_modified.init['Redundancy'])
 
+    max_ring = int(min(tip_modified.width, tip_modified.height) / 2) - 1
+    j = list(range(0, max_ring + 1, tip_modified.init['Redundancy']))
+    l_rings = [j[i]+1 for i in range(0, len(j) - 1)]
 
-# Función que lea un registro con su redundancia. Devuelve String obtenido y list_index consultado
+    # Recorremos anillos
+    for ring in l_rings:
+        # Leer linea con redundancia
+        read_count = {}
+        read = read_ring_redundancy(tip_modified.img_array, ring, tip_original.hash_image, tip_modified.init['Redundancy'], tip_modified.width, tip_modified.height)
+
+        # Comprobar si son iguales
+        for r in read:
+            if r[0] in read_count.keys():
+                read_count[r[0]] += 1
+            elif r[0] != "":
+                read_count[r[0]] = 1
+
+        # Si solo hay una clave significa que no hace falta aplicar redundancia
+        if len(read_count.keys()) == 1:
+            # No hay redundancia
+            # Se escribe en imagen original
+            text = list(read_count.keys())[0]
+            recorrido.append(text)
+            text = text.split("|")
+            tip_original.add(text[1], text[2], text[3])
+        elif len(read_count.keys()) > 1:
+            # Aplicar redundancia
+            read_count = list(read_count.items())
+            read_count.sort(key=lambda x: x[1], reverse=True)
+            text = read_count[0][0]
+            recorrido.append(text)
+            text = text.split("|")
+            tip_original.add(text[1], text[2], text[3])
+        else:
+            # No se encuentran resultados
+            break
+
+    return recorrido

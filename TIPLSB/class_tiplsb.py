@@ -7,12 +7,9 @@ import numpy as np
 from datetime import datetime
 from .function_additional import *
 
-#__version__ = "0.0.1"
-#__redundancy__ = 5
-
 
 class tiplsb:
-    def __init__(self, path):
+    def __init__(self, path, version=__version__, redundancy=__redundancy__):
         self.path = path
         # Open image
         img = Image.open(path, 'r').convert('RGB')
@@ -25,7 +22,7 @@ class tiplsb:
         # Initialize it if not
         if not bool(self.init):
             list_index = []
-            txt_init = "TIPLSB|Version:" + str(__version__) + "|Line:1|Redundancy:" + str(__redundancy__) + "#"
+            txt_init = "TIPLSB|Version:" + str(version) + "|Line:1|Redundancy:" + str(redundancy) + "#"
             txt_bin = txt_to_bin(txt_init)
             for i in range(0, len(txt_bin)):
                 list_index.append(index_element_ring(i, 0, self.width, self.height))
@@ -35,6 +32,10 @@ class tiplsb:
                 "Line": 1,
                 "Redundancy": __redundancy__
             }
+            # Actualizar hash
+            array_for_hash = self.img_array.reshape(self.height, self.width, 3)
+            img_hash = Image.fromarray(array_for_hash.astype('uint8'), 'RGB')
+            self.hash_image = hashlib.sha256(img_hash.tobytes()).hexdigest()
 
     def initialized(self):
         bits = ""
@@ -64,9 +65,9 @@ class tiplsb:
             }
             return dic_init
 
-    def add(self, author, platform):
+    def add(self, author, platform, date=str(datetime.now().time())):
         ring = self.init['Line']
-        text = "TIPLSB|" + author + "|" + platform + "|" + str(datetime.now().time()) + "#"
+        text = "TIPLSB|" + author + "|" + platform + "|" + date + "#"
         text_bin = txt_to_bin(text)
         for i in range(0, self.init['Redundancy']):
             seed_image = hex(int(self.hash_image, 16) + int(str(i), 16))[2:]
@@ -86,6 +87,10 @@ class tiplsb:
             list_index.append(index_element_ring(i, 0, self.width, self.height))
         self.write(zip(list_index, txt_bin))
         self.init['Line'] = ring
+        # Actualizar hash
+        array_for_hash = self.img_array.reshape(self.height, self.width, 3)
+        img_hash = Image.fromarray(array_for_hash.astype('uint8'), 'RGB')
+        self.hash_image = hashlib.sha256(img_hash.tobytes()).hexdigest()
 
     def write(self, zip_txt_index):
         for ((pixel, color), bit) in zip_txt_index:

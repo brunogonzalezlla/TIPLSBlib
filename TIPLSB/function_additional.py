@@ -1,5 +1,6 @@
 import random
 
+
 def max_index_element_ring(ring, width, height):
     size_width = width - (ring + 1) * 2 + 2
     size_height = height - (ring + 1) * 2 + 2
@@ -95,8 +96,6 @@ def read_ring_redundancy(array, ring, actual_hash, redundancy, width, height):
     res = []
     for i in range(0, redundancy):
         new_hash = hex(int(actual_hash, 16) + int(str(i), 16))[2:]
-        txt, list_index_read = read_ring(array, ring, new_hash, width, height)
-        if txt != "":
-            res.append(read_ring(array, ring, new_hash, width, height))
+        res.append(read_ring(array, ring, new_hash, width, height))
         ring += 1
     return res
