@@ -1,4 +1,5 @@
 import random
+import hashlib
 
 
 def max_index_element_ring(ring, width, height):
@@ -99,3 +100,18 @@ def read_ring_redundancy(array, ring, actual_hash, redundancy, width, height):
         res.append(read_ring(array, ring, new_hash, width, height))
         ring += 1
     return res
+
+
+def switch_hash(hash):
+    if hash == 'sha1':
+        return hashlib.sha1
+    elif hash == 'sha224':
+        return hashlib.sha224
+    elif hash == 'sha256':
+        return hashlib.sha256
+    elif hash == 'sha384':
+        return hashlib.sha384
+    elif hash == 'sha512':
+        return hashlib.sha512
+    else:
+        return hashlib.sha256

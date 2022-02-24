@@ -9,7 +9,7 @@ def tip_decode(path_original, path_modified):
     tip_modified = tiplsb(path_modified)
 
     # Inicializamos imagen
-    tip_original = tiplsb(path_original, version=tip_modified.init['Version'], redundancy=tip_modified.init['Redundancy'])
+    tip_original = tiplsb(path_original, hash=tip_modified.init['Hash'], version=tip_modified.init['Version'], redundancy=tip_modified.init['Redundancy'])
 
     max_ring = int(min(tip_modified.width, tip_modified.height) / 2) - 1
     j = list(range(0, max_ring + 1, tip_modified.init['Redundancy']))

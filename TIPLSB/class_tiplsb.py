@@ -9,20 +9,22 @@ from .function_additional import *
 
 
 class tiplsb:
-    def __init__(self, path, version=__version__, redundancy=__redundancy__):
+    def __init__(self, path, hash='sha256', version=__version__, redundancy=__redundancy__):
         self.path = path
-        # Open image
+
+        # Abrir imagen
         img = Image.open(path, 'r').convert('RGB')
         self.width, self.height = img.size
         self.img_array = np.array(list(img.getdata()))
-        # Hash Image
-        self.hash_image = hashlib.sha256(img.tobytes()).hexdigest()
-        # Check details
+
+
+        # Obtener detalles de la imagen
         self.init = self.initialized()
-        # Initialize it if not
+
+        # Se comprueba si la imagen está inicializada
         if not bool(self.init):
             list_index = []
-            txt_init = "TIPLSB|Version:" + str(version) + "|Line:1|Redundancy:" + str(redundancy) + "#"
+            txt_init = "TIPLSB|Version:" + str(version) + "|Line:1|Redundancy:" + str(redundancy) + "|Hash:" + str(hash) + "#"
             txt_bin = txt_to_bin(txt_init)
             for i in range(0, len(txt_bin)):
                 list_index.append(index_element_ring(i, 0, self.width, self.height))
@@ -30,23 +32,31 @@ class tiplsb:
             self.init = {
                 "Version": __version__,
                 "Line": 1,
-                "Redundancy": __redundancy__
+                "Redundancy": __redundancy__,
+                "Hash": hash
             }
             # Actualizar hash
             array_for_hash = self.img_array.reshape(self.height, self.width, 3)
             img_hash = Image.fromarray(array_for_hash.astype('uint8'), 'RGB')
-            self.hash_image = hashlib.sha256(img_hash.tobytes()).hexdigest()
+            self.hash_image = switch_hash(self.init['Hash'])(img_hash.tobytes()).hexdigest()
+        else:
+            # Obtener hash de imagen inicializada
+            self.hash_image = switch_hash(self.init['Hash'])(img.tobytes()).hexdigest()
 
     def initialized(self):
         bits = ""
         dic_init = {}
+        # Recorremos los primeros 48 bits.
         for i in range(0, 48):
             pixel, color = index_element_ring(i, 0, self.width, self.height)
             bits += bin(self.img_array[pixel][color])[2:][-1]
         text = bin_to_txt(bits)
+        # Comprobamos si en esos 48 bit se encuentra la palabra TIPLSB. Si no lo contiene significa que la imagen no
+        # se encuentra inicializada
         if not text == "TIPLSB":
             return dic_init
         else:
+            # Si se encuentra inicializada recorremos hasta encontrar el caracter #
             for i in range(48, max_index_element_ring(0, self.width, self.height), 8):
                 character_bin = ""
                 for j in range(i, i + 8):
@@ -61,14 +71,17 @@ class tiplsb:
             dic_init = {
                 "Version": st[1].split(':')[1],
                 "Line": int(st[2].split(':')[1]),
-                "Redundancy": int(st[3].split(':')[1])
+                "Redundancy": int(st[3].split(':')[1]),
+                "Hash": str(st[4].split(':')[1])
             }
             return dic_init
 
     def add(self, author, platform, date=str(datetime.now().time())):
+        # Elegimos el texto a guardar
         ring = self.init['Line']
         text = "TIPLSB|" + author + "|" + platform + "|" + date + "#"
         text_bin = txt_to_bin(text)
+        # Lo escribimos tantas veces como redundancia se haya establecido
         for i in range(0, self.init['Redundancy']):
             seed_image = hex(int(self.hash_image, 16) + int(str(i), 16))[2:]
             random.seed(seed_image)
@@ -78,10 +91,10 @@ class tiplsb:
                 list_index.append(index_element_ring(i, ring, self.width, self.height))
             self.write(zip(list_index, text_bin))
             ring += 1
-        # Update ring
+        # Actualizamos ring
         list_index = []
         txt_init = "TIPLSB|Version:" + str(self.init['Version']) + "|Line:" + str(ring) + "|Redundancy:" + str(
-            self.init['Redundancy']) + "#"
+            self.init['Redundancy']) + "|Hash:" + str(self.init['Hash']) + "#"
         txt_bin = txt_to_bin(txt_init)
         for i in range(0, len(txt_bin)):
             list_index.append(index_element_ring(i, 0, self.width, self.height))
@@ -90,13 +103,15 @@ class tiplsb:
         # Actualizar hash
         array_for_hash = self.img_array.reshape(self.height, self.width, 3)
         img_hash = Image.fromarray(array_for_hash.astype('uint8'), 'RGB')
-        self.hash_image = hashlib.sha256(img_hash.tobytes()).hexdigest()
+        self.hash_image = switch_hash(self.init['Hash'])(img_hash.tobytes()).hexdigest()
 
     def write(self, zip_txt_index):
+        # Escribimos en bits seleccionados
         for ((pixel, color), bit) in zip_txt_index:
             self.img_array[pixel][color] = self.img_array[pixel][color] & ~1 | int(bit)
 
     def save(self, path=''):
+        # Guardar imagen
         if path == '':
             new_path = self.path.split('.')[0]
         else:
