@@ -11,12 +11,27 @@ from datetime import datetime
 import hashlib
 
 # start_time = time.time()
-# i = tiplsb("img/600x600.jpg")
-# i.add("Insert1", "PLATPRUEBA")
-# i.save('img/600x600_1.jpg')
+#i = tiplsb("img/600x600.jpg")
+#i.add("Prueba", "pRUEBA")
+#i.save('img/600x600_P1.png')
+
+
+#i = tiplsb("img/600x600.jpg")
+#i.add("PruebaPrimera", "PlataformaPrimera")
+#i.save('img/600x600_P1.png')
+
+
+sol = tip_decode('img/600x600.jpg', 'img/600x600_P2.png')
+print(sol)
+
+
+#i = tiplsb("img/600x600_P1.png")
+#i.add("PruebaSegunda", "PlataformaSegunda")
+#i.save('img/600x600_P2.png')
+
 # print("Inicializada la imagen")
 # print("--- %s seconds ---" % (time.time() - start_time))
-# print(i.init)
+#print(i.init)
 # print(i.hash_image)
 
 # img = Image.open("img/600x600_1.png", 'r').convert('RGB')
@@ -31,8 +46,8 @@ import hashlib
 # print("....")
 # print(aa)
 
-sol = tip_decode("img/img.png", "img/fotosweb.png")
-print(sol)
+#sol = tip_decode('img/600x600_P1.png', 'img/600x600_P2.png')
+#print(sol)
 
 #start_time = time.time()
 #i = tiplsb("img/600_original.png")

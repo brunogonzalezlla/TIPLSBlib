@@ -44,6 +44,8 @@ def tip_decode(path_original, path_modified):
             recorrido.append(text)
             text = text.split("|")
             tip_original.add(text[1], text[2], text[3])
+            # Paramos el proceso ya que nos hemos encontrado con errores
+            break
         else:
             # No se encuentran resultados
             break

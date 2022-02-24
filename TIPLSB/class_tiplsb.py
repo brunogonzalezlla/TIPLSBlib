@@ -94,7 +94,7 @@ class tiplsb:
 
     def write(self, zip_txt_index):
         for ((pixel, color), bit) in zip_txt_index:
-            self.img_array[pixel][color] = int(bin(self.img_array[pixel][color])[2:9] + bit, 2)
+            self.img_array[pixel][color] = self.img_array[pixel][color] & ~1 | int(bit)
 
     def save(self, path=''):
         if path == '':
