@@ -76,8 +76,10 @@ class tiplsb:
             }
             return dic_init
 
-    def add(self, author, platform, date=str(datetime.now().time())):
+    def add(self, author, platform, date=False):
         # Elegimos el texto a guardar
+        if date == False:
+            date = str(datetime.now().time())
         ring = self.init['Line']
         text = "TIPLSB|" + author + "|" + platform + "|" + date + "#"
         text_bin = txt_to_bin(text)
