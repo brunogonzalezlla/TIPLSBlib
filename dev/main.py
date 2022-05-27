@@ -15,7 +15,7 @@ import os
 # i3.add("PruebaTercera", "PlataformaTercera")
 # i3.save('img/600x600_P3.png')
 
-sol = tip_decode('img/600x600.jpg', 'img/imagen2.png')
+sol = tip_decode('img/img_original.png', 'img/img_modificada.png')
 print(sol)
 
 #os.remove("img/600x600_P1.png")
