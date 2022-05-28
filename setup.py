@@ -13,7 +13,7 @@ setup(
     author_email="brunogllaga@icloud.com",
     name='TIPLSB',
     packages=find_packages(include=['TIPLSB']),
-    version='0.6',
+    version='0.0.1',
     description='Library to trace the path of an image based on LSB and RSA.',
     long_description=long_description,
     long_description_content_type="text/markdown",
