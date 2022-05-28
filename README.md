@@ -39,9 +39,9 @@ Informáticas** en la **Universidad de Sevilla**.
 
 <a name = "Instalacion"></a>
 ## Instalación
-Este proyecto está disponible en [PyPI](https://pypi.org/project/stego-lsb/) y pueden instalarlo con:
+Este proyecto está disponible en [PyPI](https://pypi.org/project/TIPLSB/) y pueden instalarlo con:
 
-    pip install tiplsb
+    pip install TIPLSB
 
 De manera alternativa, puedes instalarlo directamente del repositorio:
 
@@ -117,7 +117,9 @@ actual, sin embargo podemos personalizar la ruta estableciendo el parámetro _pa
 
 <a name = "ClasetiplsbEjemplo"></a>
 #### Ejemplo
-
+    
+    from TIPLSB import tiplsb 
+    
     obj = tiplsb("img/600x600.png")
     obj.add("Hola", "PlataformaMundo")
     obj.save()
@@ -152,6 +154,8 @@ serán las firmas.
 <a name = "FunciontipdecodeEjemplo"></a>
 #### Ejemplo
 
+    from TIPLSB import tip_decode
+    
     dec = tip_decode('img/600x600.png', 'img/600x600_2_firmas.png')
     print(dec)
     > {0: 'TIPLSB|Hola|PlataformaMundo|22:43:21.975652', 1: 'TIPLSB|Bruno|TIPLSBapp|23:15:06.175428'}
@@ -175,7 +179,7 @@ Debemos añadir una vista nueva la cual será la encargada de devolver las imág
 
 Añadimos el siguiente extracto:
 
-    from tiplsb import *
+    from TIPLSB import tiplsb
     from PIL import Image
     from django.http import HttpResponseNotFound, HttpResponse
     from os.path import exists
